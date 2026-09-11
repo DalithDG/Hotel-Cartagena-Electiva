@@ -5,8 +5,6 @@ import 'models/habitacion.dart';
 import 'models/huesped.dart';
 import 'enums/tipo_habitacion.dart';
 
-// Se encarga únicamente de mostrar menús, leer datos del usuario
-// y llamar a los métodos de Hotel. No contiene reglas de negocio.
 class SistemaHotel {
   final Hotel hotel = Hotel();
 
@@ -40,7 +38,7 @@ class SistemaHotel {
     }
   }
 
-  // ---------- Menú del recepcionista ----------
+  //  Menú del recepcionista
 
   void menuRecepcionista() {
     bool volver = false;
@@ -79,8 +77,6 @@ class SistemaHotel {
     }
   }
 
-  // ---------- Acciones ----------
-
   void registrarRecepcionista() {
     String usuario = leerTextoNoVacio('Usuario: ');
     String contrasena = leerTextoNoVacio('Contraseña: ');
@@ -117,8 +113,6 @@ class SistemaHotel {
       return;
     }
 
-    // Se agrupan por tipo para cumplir el RF03: recorremos cada tipo
-    // y luego revisamos qué habitaciones disponibles son de ese tipo.
     print('Habitaciones disponibles:');
     for (var tipo in TipoHabitacion.values) {
       String numeros = '';
@@ -159,8 +153,6 @@ class SistemaHotel {
     print(resultado);
   }
 
-  // ---------- Utilidades de lectura (validan entradas del usuario) ----------
-
   String leerOpcion() {
     String? texto = stdin.readLineSync();
     if (texto == null) {
@@ -169,7 +161,6 @@ class SistemaHotel {
     return texto.trim();
   }
 
-  // Pide un texto y no deja continuar hasta que no esté vacío (caso T12).
   String leerTextoNoVacio(String mensaje) {
     while (true) {
       stdout.write(mensaje);

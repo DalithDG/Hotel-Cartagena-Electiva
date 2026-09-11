@@ -42,7 +42,7 @@ class Hotel {
     );
   }
 
-  // ---------- RF01 y RF02: Recepcionistas ----------
+  //  RF01 y RF02: Recepcionistas
 
   // Devuelve true si el registro fue exitoso, false si el usuario ya existe.
   bool registrarRecepcionista(String usuario, String contrasena) {
@@ -62,6 +62,98 @@ class Hotel {
       }
     }
     return false;
+  }
+  // RF04 y RF05: Reservar habitación
+
+  // Devuelve un mensaje indicando el resultado de la operación.
+  // Se usa String en vez de bool para poder explicar el motivo del rechazo.
+  String reservarHabitacion(Huesped huesped, int numeroHabitacion, int dias) {
+    Habitacion? habitacion = buscarHabitacion(numeroHabitacion);
+
+    if (habitacion == null) {
+      return 'La habitación no existe.';
+    }
+    if (habitacion.estado != EstadoHabitacion.disponible) {
+      return 'La habitación no está disponible.';
+    }
+    if (dias <= 0) {
+      return 'Los días deben ser mayores que cero.';
+    }
+
+    habitacion.estado = EstadoHabitacion.reservada;
+    Reserva nuevaReserva = Reserva(
+      huesped: huesped,
+      numeroHabitacion: numeroHabitacion,
+      dias: dias,
+    );
+    reservas.add(nuevaReserva);
+
+    return 'Reserva creada con éxito.';
+  }
+
+  // Check-in
+
+  String hacerCheckIn(int numeroHabitacion, int personas) {
+    Habitacion? habitacion = buscarHabitacion(numeroHabitacion);
+
+    if (habitacion == null) {
+      return 'La habitación no existe.';
+    }
+
+    // Buscamos si existe una reserva activa para esta habitación.
+    bool tieneReservaActiva = false;
+    for (var r in reservas) {
+      if (r.numeroHabitacion == numeroHabitacion && r.activa) {
+        tieneReservaActiva = true;
+      }
+    }
+
+    if (!tieneReservaActiva) {
+      return 'No existe una reserva activa para esta habitación.';
+    }
+    if (habitacion.estado != EstadoHabitacion.reservada) {
+      return 'La habitación no está reservada.';
+    }
+    if (personas <= 0) {
+      return 'El número de personas debe ser mayor que cero.';
+    }
+    if (personas > habitacion.capacidad) {
+      return 'El número de personas supera la capacidad.';
+    }
+
+    habitacion.estado = EstadoHabitacion.ocupada;
+    checkIns.add(
+      CheckIn(numeroHabitacion: numeroHabitacion, personas: personas),
+    );
+
+    return 'Check-in realizado con éxito.';
+  }
+
+  // Check-out
+
+  String hacerCheckOut(int numeroHabitacion) {
+    Habitacion? habitacion = buscarHabitacion(numeroHabitacion);
+
+    if (habitacion == null) {
+      return 'La habitación no existe.';
+    }
+    if (habitacion.estado != EstadoHabitacion.ocupada) {
+      return 'La habitación no está ocupada.';
+    }
+
+    habitacion.estado = EstadoHabitacion.disponible;
+    checkOuts.add(CheckOut(numeroHabitacion: numeroHabitacion));
+
+    // Decisión de diseño: la reserva no se elimina, se marca como inactiva
+    // para conservarla como historial (ver README, sección de decisiones).
+    for (var r in reservas) {
+      if (r.numeroHabitacion == numeroHabitacion && r.activa) {
+        r.activa = false;
+        break;
+      }
+    }
+
+    return 'Check-out realizado con éxito.';
   }
 
   // ---------- Buscar y consultar habitaciones (RF03) ----------
